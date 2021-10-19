@@ -1,21 +1,19 @@
 # Python File function for streamlit tools
 # Sales Baños y Cocna
-# 03-August-2021
 # ----------------------------------------------------------------------------------------------------------------------
 # Libraries
-import pandas as pd
-
 import datetime
-import calendar as cl
 
-import streamlit as st
+import pandas as pd
 import pyodbc
+import streamlit as st
 
-from Plot_Function_Climat import plot_html
+from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT
+
+
 # ----------------------------------------------------------------------------------------------------------------------
-
 # Function definition
-@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=False)
+#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=False)
 def load_data(folder="./Data/Raw/", filename="tabla_robot1_2021_04_22_1012.csv"):
     """
     Función que carga el archivo csv guardado al conectar con la base de datos y devuelve un dataframe
@@ -23,6 +21,7 @@ def load_data(folder="./Data/Raw/", filename="tabla_robot1_2021_04_22_1012.csv")
     df = pd.read_csv(folder + filename, )
 
     return df
+
 
 def fecha_format(df):
     """
@@ -58,7 +57,8 @@ def fecha_format(df):
 
     return df
 
-@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=600)
+
+#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=600)
 def sql_connect(tipo="day", day="2021-04-28", ini="2021-04-27", server='EASAB101', database='CLIMATI',
                 table="CLIMATI", username='IOTVARPROC', password='10Tv4rPr0C2021*'):
     """
@@ -103,13 +103,14 @@ def sql_connect(tipo="day", day="2021-04-28", ini="2021-04-27", server='EASAB101
 
     return pd_sql
 
-@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=600)
-def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CLIMATI', table="CLIMATI"):
+
+#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=600)
+def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CLIMATI', table="CLIMATI",
+                    page="Salon 3"):
     """
     Función que se conecta a la base de dato y crea el archivo de visualización a la vez que lo guarda
     INPUT:
-        tipo = ["day", "all", "turno", "rango"]
-        turno = 1 or 2 or 3
+        tipo = ["day", "all", "rango"]
         day = Día inicial EN STR
         ini = Día final EN STR (util cuando el tipo es rango)
     OUTPUT:
@@ -118,14 +119,20 @@ def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CL
     df = sql_connect(tipo=tipo, day=day, ini=ini, database=database, table=table)
     df = fecha_format(df)
 
-    # Defining the title and filename for saving the plots
-    if tipo == "day":
-        filename = table + '_día_' + day + '.html'
-        title = "Climatización Salon 3 del Día " + day
-    elif tipo == "rango":
-        filename = table + '_entre_' + ini + "_y_" + day + '.html'
-        title = " Climatización Salon 3 entre " + ini + " y " + day
-
     # Plotting the DF
-    fig = plot_html(df, title, filename)
+    if page == "Salon 3":
+        # Defining the title and filename for saving the plots
+        if tipo == "day":
+            title = "Climatización Salon 3 del Día " + day
+        elif tipo == "rango":
+            title = " Climatización Salon 3 entre " + ini + " y " + day
+        fig = plot_html_Salon3(df, title)
+    elif page == "Salon CBC/BDT":
+        # Defining the title and filename for saving the plots
+        if tipo == "day":
+            title = "Climatización Salon CBC/BDT del Día " + day
+        elif tipo == "rango":
+            title = " Climatización Salon CBC/BDT entre " + ini + " y " + day
+        fig = plot_html_CBC_BDT(df, title)
+
     return df, fig

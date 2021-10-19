@@ -1,18 +1,15 @@
 # Python File for streamlit tools
 # Sales Baños y Cocna
-# 03-August-2021
 # ----------------------------------------------------------------------------------------------------------------------
 # Libraries
 import datetime
-import numpy as np
-import pandas as pd
 
 import streamlit as st
-
-from st_aggrid import AgGrid, GridOptionsBuilder
+from st_aggrid import AgGrid
 
 # Internal Function
 from SQL_Function_Climat import sql_plot_climat
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Streamlit Setting
 st.set_page_config(page_title="IIOT - Corona - Climatización Girardota",
@@ -20,13 +17,15 @@ st.set_page_config(page_title="IIOT - Corona - Climatización Girardota",
                    page_icon="📈",
                    layout="wide")
 
-tabs = ["Climatización Salon 3", "Climatización Salon CBC/BDT" ]
-page = st.sidebar.radio("Tabs", tabs)
+#tabs = ["Climatización Salon 3", "Climatización Salon CBC/BDT" ]
+#page = st.sidebar.radio("Tabs", tabs)
 # ----------------------------------------------------------------------------------------------------------------------
 # Importing the DataFrame
 st.title(' 📈 IIOT|Corona: Climatización Salones Girardota')
 
-if page == "Climatización Salon 3":
+climat = st.radio("¿Que salon desea visualizar?", ["Salon 3", "Salon CBC/BDT"], 0)
+
+if climat == "Salon 3":
     st.header("Climatización Salon 3")
     st.subheader("1.Selección de Data a Analizar")
     c1, c2 = st.columns(2)
@@ -55,26 +54,19 @@ if page == "Climatización Salon 3":
             else:
                 st.info("Analizaras un periodo de tiempo de " + str((sel_dia_fin - sel_dia_ini).days + 1) + " días.")
 
-    st.subheader("2.Visualización de la Data a Analizar")
-    if st.checkbox("Graficar Información", key="Presecadero"):
+    st.subheader("2.Visualización de los Datos")
+    if st.checkbox("Graficar Información", key="climat"):
         with st.spinner('Descargando la información y dibujandola...'):
             if sel_fecha == "Por día":
-                df, fig = sql_plot_climat(tipo="day", day=str(sel_dia), database='CLIMATI', table="CLIMATI")
+                df, fig = sql_plot_climat(tipo="day", day=str(sel_dia), database='CLIMATI', table="CLIMATI",
+                                          page=climat)
                 st.plotly_chart(fig, use_container_width=True)
             elif sel_fecha == "Por rango de días":
                 df, fig = sql_plot_climat(tipo="rango", ini=str(sel_dia_ini), day=str(sel_dia_fin),
-                                           database='CLIMATI',
-                                           table="CLIMATI")
+                                           database='CLIMATI', table="CLIMATI", page=climat)
                 st.plotly_chart(fig, use_container_width=True)
 
-        st.subheader("3. Analizar Información")
-        gb = GridOptionsBuilder.from_dataframe(df)
-        #gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
-        gb.configure_side_bar()
-        gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc="sum",
-                                    editable=False)
-        gridOptions = gb.build()
-
+        st.subheader("3. Mostrar Base de datos")
         tabla = AgGrid(df,
                        editable=False,
                        sortable=True,
@@ -85,9 +77,10 @@ if page == "Climatización Salon 3":
                        theme="streamlit",  # "light", "dark", "blue", "fresh", "material"
                        key='analisis_table',
                        reload_data=True,
-                       gridOptions=gridOptions, enable_enterprise_modules=True
                        )
-elif page == "Climatización Salon CBC/BDT":
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+elif climat == "Salon CBC/BDT":
     st.header("Climatización Salon CBC/BDT")
     st.subheader("1.Selección de Data a Analizar")
     c1, c2 = st.columns(2)
@@ -115,6 +108,31 @@ elif page == "Climatización Salon CBC/BDT":
                 st.stop()
             else:
                 st.info("Analizaras un periodo de tiempo de " + str((sel_dia_fin - sel_dia_ini).days + 1) + " días.")
+
+    st.subheader("2.Visualización de los Datos")
+    if st.checkbox("Graficar Información", key="climat"):
+        with st.spinner('Descargando la información y dibujandola...'):
+            if sel_fecha == "Por día":
+                df, fig = sql_plot_climat(tipo="day", day=str(sel_dia), database='CLIMATI', table="CLIMATI",
+                                          page=climat)
+                st.plotly_chart(fig, use_container_width=True)
+            elif sel_fecha == "Por rango de días":
+                df, fig = sql_plot_climat(tipo="rango", ini=str(sel_dia_ini), day=str(sel_dia_fin),
+                                          database='CLIMATI', table="CLIMATI", page=climat)
+                st.plotly_chart(fig, use_container_width=True)
+
+        st.subheader("3. Mostrar Base de datos")
+        tabla = AgGrid(df,
+                       editable=False,
+                       sortable=True,
+                       filter=True,
+                       resizable=True,
+                       defaultWidth=5,
+                       fit_columns_on_grid_load=False,
+                       theme="streamlit",  # "light", "dark", "blue", "fresh", "material"
+                       key='analisis_table',
+                       reload_data=True,
+                       )
 
 
 
