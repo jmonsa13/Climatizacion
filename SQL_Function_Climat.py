@@ -116,6 +116,8 @@ def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CL
     OUTPUT:
         df = pandas dataframe traido de la base de dato SQL
     """
+    # TODO: implementar el codigo que busca la información si esta ya fue descargada para agilizar el programa.
+
     df = sql_connect(tipo=tipo, day=day, ini=ini, database=database, table=table)
     df = fecha_format(df)
 

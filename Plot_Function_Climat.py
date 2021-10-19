@@ -127,6 +127,8 @@ def plot_html_CBC_BDT(df, title):
                              mode='lines', name='HR pasillo'),
                   secondary_y=True, row=2, col=1)
 
+    # TODO: agregar las temperaturas que falta, estas deben de agregarse primero a la base de datos
+
     # Add figure title
     fig.update_layout(height=800, title=title)
 
