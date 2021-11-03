@@ -6,14 +6,10 @@ import datetime
 
 import pandas as pd
 import pyodbc
-import streamlit as st
 
 from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Function definition
-#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=False)
 def load_data(folder="./Data/Raw/", filename="tabla_robot1_2021_04_22_1012.csv"):
     """
     Función que carga el archivo csv guardado al conectar con la base de datos y devuelve un dataframe
@@ -58,7 +54,6 @@ def fecha_format(df):
     return df
 
 
-#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=600)
 def sql_connect(tipo="day", day="2021-04-28", ini="2021-04-27", server='EASAB101', database='CLIMATI',
                 table="CLIMATI", username='IOTVARPROC', password='10Tv4rPr0C2021*'):
     """
@@ -104,7 +99,6 @@ def sql_connect(tipo="day", day="2021-04-28", ini="2021-04-27", server='EASAB101
     return pd_sql
 
 
-#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=600)
 def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CLIMATI', table="CLIMATI",
                     page="Salon 3"):
     """
