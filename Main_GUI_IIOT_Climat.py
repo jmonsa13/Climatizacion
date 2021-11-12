@@ -60,11 +60,11 @@ if climat == "Salon 3":
             if sel_fecha == "Por día":
                 df, fig = sql_plot_climat(tipo="day", day=str(sel_dia), database='CLIMATI', table="CLIMATI",
                                           page=climat)
-                st.plotly_chart(fig, use_container_width=True)
             elif sel_fecha == "Por rango de días":
                 df, fig = sql_plot_climat(tipo="rango", ini=str(sel_dia_ini), day=str(sel_dia_fin),
                                            database='CLIMATI', table="CLIMATI", page=climat)
-                st.plotly_chart(fig, use_container_width=True)
+            # Plotly
+            st.plotly_chart(fig, use_container_width=True)
 
         st.subheader("3. Mostrar Base de datos")
         tabla = AgGrid(df,

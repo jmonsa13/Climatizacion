@@ -123,6 +123,7 @@ def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CL
         elif tipo == "rango":
             title = " Climatización Salon 3 entre " + ini + " y " + day
         fig = plot_html_Salon3(df, title)
+
     elif page == "Salon CBC/BDT":
         # Defining the title and filename for saving the plots
         if tipo == "day":
