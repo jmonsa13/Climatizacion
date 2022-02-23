@@ -84,7 +84,7 @@ def sql_connect(tipo="day", day="2021-04-28", ini="2021-04-27", server='EASAB101
                                    conn)
 
         # Saving the files
-        #pd_sql.to_csv('./Data/Raw/tabla_' + table + '_' + day + '.csv', index=False)
+        pd_sql.to_csv('./Data/Raw/tabla_' + table + '_' + day + '.csv', index=False)
         # pd_sql.to_excel('./Data/Raw/tabla_' + table + '_'+ day + '.xlsx', index = False )
 
     elif tipo == "rango":
