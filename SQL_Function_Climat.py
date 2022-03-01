@@ -1,15 +1,20 @@
 # Python File function for streamlit tools
-# Sales Baños y Cocna
+# Climatización Girardota Salon 3 y CBC/BDT
 # ----------------------------------------------------------------------------------------------------------------------
 # Libraries
 import datetime
+import os
 
+import numpy as np
 import pandas as pd
 import pyodbc
+import streamlit as st
+
 
 from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT
 # ----------------------------------------------------------------------------------------------------------------------
 # Function definition
+@st.experimental_memo(suppress_st_warning=True, show_spinner=True)
 def load_data(folder="./Data/Raw/", filename="tabla_robot1_2021_04_22_1012.csv"):
     """
     Función que carga el archivo csv guardado al conectar con la base de datos y devuelve un dataframe
@@ -19,9 +24,14 @@ def load_data(folder="./Data/Raw/", filename="tabla_robot1_2021_04_22_1012.csv")
     return df
 
 
-def fecha_format(df):
+def organize_df(df):
     """
-    Función que hace el manejo de la columna de fecha de la base de datos
+    Función que organiza el data frame, generando nuevas columnas de informaciónd e fechas, reorganizando las columnas
+    y redodeando los valores a 2 cifras decimales.
+    INPUT:
+        df = data frame original
+    OUTPUT:
+        df = data frame  reorganizado
     """
     # Organizar el tema de fecha
     df["fecha"] = pd.to_datetime(df['fecha'], format='%Y/%m/%d', exact=False)
@@ -40,96 +50,226 @@ def fecha_format(df):
                           enumerate(df["fecha"])]
 
     # Organizo las columnas
-    #re_columns = ['estado', 'fecha', 'referencia', 'peso_antes', 'peso_despues', 'sp_fmasico', 'fmasico',
-                  #'sp_patomizacion', 'patomizacion',
-                  #'sp_pabanico', 'pabanico', 'presion_red', 'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo',
-                  #"fecha_planta"]
-    #df = df[re_columns]
+    re_columns = ['fecha', 'Tempwh', 'TempSuccion', 'Temp_Exterior_Amb',
+                  'Tempcirc_caldera', 'Tempentagua', "Tempcircagua", "Prescircagua",
+                  'TempInyecbdtcbc', 'TempBDT1y2', 'HumBDT1y2', 'TempBDT3y4', 'HumBDT3y4',
+                   'TempPresBDT4', 'HumPresBDT4', 'SP_TempPresBDT4', 'SP_HumPresBDT4',
+                  'TempBDT5', 'HumBDT5', 'TempBDT6', 'HumBDT6',
+                  'Motinyecbdtamp', 'Motinyecbdtpot', 'Motinyecbdthz',
+                  "Automatico_CBCBDT", 'Comp_BDT_Succion', 'Comp_BDT_Exterior', 'Comp_BDT_Recircula',
+                  'TempInyecsalon3', 'TempInyecquemsalon3', 'S3temppmax', 'S3humpmax', 'S3temptac', 'S3humtac',
+                  'SP_Temp_QS3', 'SP_Temp_S3', 'SP_Humedad_S3',
+                  'Motinyecsal3amp', 'Motinyecsal3pot', 'Motinyecsal3hz',
+                  'Automatico_S3', 'Comp_S3_Exterior', 'Comp_S3_Succion',
+                  'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla',
+                  'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"
+                  ]
+    df = df[re_columns]
 
-    # Ordeno la data por la fecha
+    # Round the complete dataframe
+    df = df.round(2)
+
+    # Sorting the df by the date
     df = df.sort_values(by='fecha', ascending=True)
 
+    # Setting fecha as an index
     df.set_index("fecha", inplace=True, drop=False)
 
     return df
 
 
-def sql_connect(tipo="day", day="2021-04-28", ini="2021-04-27", server='EASAB101', database='CLIMATI',
-                table="CLIMATI", username='IOTVARPROC', password='10Tv4rPr0C2021*'):
+def add_day(day, add=1):
     """
-    Programa que permite conectar con una base de dato del seervidor y devuelve la base de dato como un pandas dataframe
+    Función agrega o quita dias, teniendo en cuenta inicio de mes e inicio de año
+    INPUT
+        day = "2021-02-01"  EN STRING
+    OUTPUT
+        ini_date = día entregado en STR
+        fin_date = día con los días sumados o restados en STR al día ingresado
+    """
+    l_day_n = [int(x) for x in day.split("-")]
+    ini_date = datetime.date(l_day_n[0], l_day_n[1], l_day_n[2])
+    fin_date = ini_date + datetime.timedelta(days=add)
+
+    return str(ini_date), str(fin_date)
+
+
+@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
+def get_data_day(sel_dia="2022-01-01", flag_download=False):
+    """
+    Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
     INPUT:
-        tipo = ["day", "all", "turno", "rango"]
-        day = Día inicial EN STR
+        sel_dia = Día inicial EN STR
+        redownload = Debe descargarse la data o buscar dentro de los archivos previamente descargados.
     OUTPUT:
-        pd_sql = pandas dataframe traido de la base de dato SQL
+        df = pandas dataframe traído de la base de dato SQL
+        salud_list = lista con el dato de salud por día
+        salud_datos = Número | Salud total de los datos
+        title = Título para la gráfica
     """
+    # Definición del numero total de datos por días
+    datos_días = 24 * 60 * 2  # 24 horas en un día x 60 minutos en cada hora x 2 veces que tomo el dato cada minuto
 
-    # Connecting to the sql database
-    conn = pyodbc.connect(
-        'driver={SQL Server};server=%s;database=%s;uid=%s;pwd=%s' % (server, database, username, password))
+    # Conexión a la base de datos SQL
+    df = find_load(tipo="day_planta", day=str(sel_dia), ini=None, database="CLIMATI",
+                   table="CLIMATI", redownload=flag_download)
+    df = organize_df(df)
 
-    if tipo == "all":
-        pd_sql = pd.read_sql_query('SELECT * FROM ' + database + '.dbo.' + table, conn)
+    # Defining the title and filename for saving the plots
+    title = "Variables de Climatización Día " + str(sel_dia)
 
-        # Saving the sql dataframe to a output file
-        now = datetime.datetime.now()
-        dt_string = now.strftime("%Y_%m_%d_%H%M")
+    # Salud de los datos
+    salud_datos = (df.shape[0] / datos_días) * 100
+    salud_list = [np.round(salud_datos, 2)]
 
-        #pd_sql.to_csv('./Data/Raw/All_tabla_' + table + '_' + dt_string + '.csv', index=False)
-        #pd_sql.to_excel('./Data/Raw/All_tabla_' + table + '_'+ dt_string + '.xlsx', index = False )
+    return df, salud_list, salud_datos, title
 
-    elif tipo == "day":
-        pd_sql = pd.read_sql_query("SELECT * FROM " + database + ".dbo." + table + " WHERE fecha like '" + day + "'",
-                                   conn)
 
-        # Saving the files
-        pd_sql.to_csv('./Data/Raw/tabla_' + table + '_' + day + '.csv', index=False)
-        # pd_sql.to_excel('./Data/Raw/tabla_' + table + '_'+ day + '.xlsx', index = False )
+@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
+def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", flag_download=False):
+    """
+    Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
+    del periodo de fecha ingresado
+    INPUT:
+        sel_dia_ini = Día inicial en STR ("2022-01-01")
+        sel_dia_fin = Día final en STR ("2022-01-02")
+        redownload = Debe descargarse la data o buscar dentro de los archivos previamente descargados
+    OUTPUT:
+        df = pandas dataframe traído de la base de dato SQL
+        salud_list = lista con el dato de salud por día
+        salud_datos = Número | Salud total de los datos.
+        title = Título para la gráfica
+        """
+    # Definición del numero total de datos por días
+    datos_días = 24 * 60 * 2  # 24 horas en un día x 60 minutos en cada hora x 2 veces que tomo el dato cada minuto
 
-    elif tipo == "rango":
-        pd_sql = pd.read_sql_query(
-            "SELECT * FROM " + database + ".dbo." + table + " WHERE fecha between '" + ini + "'" + " AND '" + day + "'",
-            conn)
+    # Conexión a la base de datos SQL
+    # Conexión y manejo robot 1 o robot 2
+    df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
+                   table="CLIMATI", redownload=flag_download)
+    df = organize_df(df)
 
-        # Saving the files
-        #pd_sql.to_csv('./Data/Raw/tabla_' + table + '_entre_' + ini + "_y_" + day + '.csv', index=False)
-        # pd_sql.to_excel('./Data/Raw/tabla_' + table + '_entre_'+ ini +"_y_"+ day + '.xlsx', index = False )
+    # Defining the title and filename for saving the plots
+    title = "Variables de Climatización entre " + str(sel_dia_ini) + " y " + str(sel_dia_fin)
+
+    # Salud de cada día en el periodo
+    salud_list = []
+    while sel_dia_ini <= sel_dia_fin:
+        df_filter = df.loc[(df.index >= str(sel_dia_ini) + ' 06:00:00') &
+                           (df.index <= str(sel_dia_ini + datetime.timedelta(days=1)) + ' 05:59:59')]
+
+        salud_dia = np.round((df_filter.shape[0] / datos_días) * 100, 2)
+        salud_list.append(salud_dia)
+        # Avanzo un día
+        sel_dia_ini = sel_dia_ini + datetime.timedelta(days=1)
+    salud_datos = sum(salud_list) / len(salud_list)
+
+    return df, salud_list, salud_datos, title
+
+
+# No poner cache en esta función para poder cargar los ultimos datos del día.
+def find_load(tipo, day, ini, database, table, redownload):
+    """
+    Función que busca y carga el archivo de datos si este ya ha sido descargado. En caso contrario lo descarga a través
+    de la función sql_connet
+    INPUT:
+        tipo: ["day_planta", "rango_planta"].
+        day: día final o unico día a analizar como STR ("2022-01-01").
+        ini: día inicial a analizar en el rango como STR ("2021-12-28").
+        database: base de dato a la cual se debe conectar.
+        table: tabla a la cual se debe conectar.
+        redownload = TRUE or FALSE statement si es TRUE se omite la parte de buscar el archivo y se descarga nuevamente.
+    OUTPUT:
+        pd_sql: dataframe con los datos buscados o descargados
+    """
+    # Setting the folder where to search
+    directory = './Data/Raw/' + day[:-3] + '/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filenames = os.listdir(directory)
+
+    # Empty dataframe
+    pd_sql = pd.DataFrame()
+
+    if tipo == "day_planta":
+        # Creo el nombre del archivo a buscar
+        filename = 'tabla_' + table + '_' + day + '.csv'
+        if filename in filenames and redownload is False:
+            pd_sql = load_data(folder=directory, filename=filename)
+        else:
+            pd_sql = sql_connect(tipo=tipo, day=day, database=database, table=table)
+
+    elif tipo == "rango_planta":
+        # Fecha Inicial
+        l_ini_n = [int(x) for x in ini.split("-")]
+        ini_date = datetime.date(l_ini_n[0], l_ini_n[1], l_ini_n[2])
+        # Fecha Final
+        l_day_n = [int(x) for x in day.split("-")]
+        day_date = datetime.date(l_day_n[0], l_day_n[1], l_day_n[2])
+
+        # Recorro los días de ese periodo de tiempo
+        while ini_date <= day_date:
+            # Creo el nombre del archivo a buscar
+            filename = 'tabla_' + table + '_' + str(ini_date) + '.csv'
+            if filename in filenames and redownload is False:
+                aux = load_data(folder=directory, filename=filename)
+            else:
+                aux = sql_connect(tipo="day_planta", day=str(ini_date), database=database, table=table)
+
+            pd_sql = pd.concat([pd_sql, aux])
+            # Avanzo un día
+            ini_date = ini_date + datetime.timedelta(days=1)
 
     return pd_sql
 
-
-def sql_plot_climat(tipo="day", day="2021-04-28", ini="2021-04-27", database='CLIMATI', table="CLIMATI",
-                    page="Salon 3"):
+# No poner cache en esta función para poder cargar los ultimos datos del día
+def sql_connect(tipo="day", day="2021-04-28", server='EASAB101', database='CLIMATI',
+                table="CLIMATI", username='IOTVARPROC', password='10Tv4rPr0C2021*'):
     """
-    Función que se conecta a la base de dato y crea el archivo de visualización a la vez que lo guarda
+    Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
     INPUT:
-        tipo = ["day", "all", "rango"]
-        day = Día inicial EN STR
-        ini = Día final EN STR (util cuando el tipo es rango)
+        tipo = ["day_planta", "day"]
+        day = Día a descargar en  STR ("2021-04-28")
+        database: base de dato a la cual se debe conectar
+        table: tabla a la cual se debe conectar
     OUTPUT:
-        df = pandas dataframe traido de la base de dato SQL
+        pd_sql = pandas dataframe traído de la base de dato SQL
     """
-    # TODO: implementar el codigo que busca la información si esta ya fue descargada para agilizar el programa.
+    # Connecting to the sql database
+    conn = pyodbc.connect(
+        'driver={SQL Server};server=%s;database=%s;uid=%s;pwd=%s' % (server, database, username, password))
+    # ------------------------------------------------------------------------------------------------------------------
+    # Tipos de conexiones establecidas para traer distintas cantidades de datos
+    # ------------------------------------------------------------------------------------------------------------------
+    if tipo == "day":
+        pd_sql = pd.read_sql_query("SELECT * FROM " + database + ".dbo." + table + " WHERE fecha like '" + day + "'",
+                                   conn)
 
-    df = sql_connect(tipo=tipo, day=day, ini=ini, database=database, table=table)
-    df = fecha_format(df)
+        # Guardando los datos en archivos estaticos
+        if day == str(datetime.date.today()):
+            pass  # No guardar datos si el día seleccionado es el día actual del sistema
+        else:
+            pd_sql.to_csv('./Data/Raw/tabla_' + table + '_' + day + '.csv', index=False)
+            # pd_sql.to_excel('./Data/Raw/tabla_' + table + '_'+ day + '.xlsx', index = False )
 
-    # Plotting the DF
-    if page == "Salon 3":
-        # Defining the title and filename for saving the plots
-        if tipo == "day":
-            title = "Climatización Salon 3 del Día " + day
-        elif tipo == "rango":
-            title = " Climatización Salon 3 entre " + ini + " y " + day
-        fig = plot_html_Salon3(df, title)
+    elif tipo == "day_planta":
+        ini, fin = add_day(day)
+        pd_sql_1 = pd.read_sql_query("SELECT * FROM " + database + ".dbo." + table + " WHERE fecha like '" + ini + "'"
+                                     + " AND hora between 6 and 23", conn)
 
-    elif page == "Salon CBC/BDT":
-        # Defining the title and filename for saving the plots
-        if tipo == "day":
-            title = "Climatización Salon CBC/BDT del Día " + day
-        elif tipo == "rango":
-            title = " Climatización Salon CBC/BDT entre " + ini + " y " + day
-        fig = plot_html_CBC_BDT(df, title)
+        pd_sql_2 = pd.read_sql_query("SELECT * FROM " + database + ".dbo." + table + " WHERE fecha like '" + fin + "'"
+                                     + " AND hora between 0 and 5", conn)
+        pd_sql = pd.concat([pd_sql_1, pd_sql_2])
 
-    return df, fig
+        # Guardando los datos en archivos estaticos
+        if day == str(datetime.date.today()):
+            pass  # No guardar datos si el día seleccionado es el día actual del sistema
+        else:
+            # Checking and creating the folder
+            folder = day[:-3]
+            if not os.path.exists('./Data/Raw/' + folder):
+                os.makedirs('./Data/Raw/' + folder)
+            # Saving the raw data
+            pd_sql.to_csv('./Data/Raw/' + folder + '/tabla_' + table + '_' + day + '.csv', index=False)
+
+    return pd_sql

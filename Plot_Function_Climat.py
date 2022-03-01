@@ -8,8 +8,17 @@ from plotly.subplots import make_subplots
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True)
+@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
 def plot_html_Salon3(df, title):
+    """
+    Función para dibujar los datos de temperatura del salon 3
+    INPUT:
+        df = pandas dataframe traído de la base de dato SQL
+        title = Título de la gráfica
+    OUTPUT:
+        fig = objeto figura para dibujarlo externamente de la función
+    """
+
     # Create figure with secondary y-axis
     fig = make_subplots(rows=2, cols=1,  specs=[[{"secondary_y": True}], [{"secondary_y": True}]],
                         shared_xaxes=True, vertical_spacing=0.02,
@@ -43,8 +52,8 @@ def plot_html_Salon3(df, title):
                              ),
                   row=1, col=1)
 
-    # QS3 barrido
-    fig.add_trace(go.Scatter(x=df.index, y=df["QS3barrido"],
+    # QS3ON_PLC
+    fig.add_trace(go.Scatter(x=df.index, y=df["QS3ON_PLC"],
                              line=dict(width=1, dash='dash'),
                              mode='lines', name='Quemador Barrido S3',
                              visible='legendonly',
@@ -52,8 +61,8 @@ def plot_html_Salon3(df, title):
                              ),
                   secondary_y=True, row=1, col=1)
 
-    # QS3 ON/OFF
-    fig.add_trace(go.Scatter(x=df.index, y=df["QS3On"],
+    # QS3On_Confirm
+    fig.add_trace(go.Scatter(x=df.index, y=df["QS3On_Confirm"],
                              line=dict(width=1, dash='dash'),
                              mode='lines', name='Quemador ON/OFF S3',
                              visible='legendonly',
@@ -125,8 +134,16 @@ def plot_html_Salon3(df, title):
     return fig
 
 
-#@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True)
+@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
 def plot_html_CBC_BDT(df, title):
+    """
+    Función para dibujar los datos de temperatura de los salones CBC-BDT
+    INPUT:
+        df = pandas dataframe traído de la base de dato SQL
+        title = Título de la gráfica
+    OUTPUT:
+        fig = objeto figura para dibujarlo externamente de la función
+    """
     # Create figure with secondary y-axis
     fig = make_subplots(rows=2, cols=1,  specs=[[{"secondary_y": False}], [{"secondary_y": True}]],
                         shared_xaxes=True, vertical_spacing=0.02,
