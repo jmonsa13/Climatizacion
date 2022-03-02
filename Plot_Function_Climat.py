@@ -283,7 +283,7 @@ def plot_html_CBC_BDT(df, title):
     fig = plot_on_off(fig, df, "Comp_BDT_Exterior", "Compuerta Exterior", 'rgba(55,126,184,0.3)', axis_y="y4", r=2, c=1)
 
     # Compuerta Recirculación
-    fig = plot_on_off(fig, df, "Comp_BDT_Recircula", "Compuerta Recirculación", 'rgba(55,126,184,0.3)', axis_y="y4",
+    fig = plot_on_off(fig, df, "Comp_BDT_Recircula", "Compuerta Recirculación", 'rgba(77,175,74,0.3)', axis_y="y4",
                       r=2, c=1)
 
     # Add figure title
