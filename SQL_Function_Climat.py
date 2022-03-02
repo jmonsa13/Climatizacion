@@ -49,17 +49,21 @@ def organize_df(df):
     df["fecha_planta"] = [elem - datetime.timedelta(days=1) if df["hora"].iloc[x] < 6 else elem for x, elem in
                           enumerate(df["fecha"])]
 
+    # Creo columna de encendido ventiladores
+    df["MontinyecbdtON"] = [1 if i > 0 else 0 for i in df["Motinyecbdthz"]]
+    df["Montinyecsal3ON"] = [1 if i > 0 else 0 for i in df["Motinyecsal3hz"]]
+
     # Organizo las columnas
     re_columns = ['fecha', 'Tempwh', 'TempSuccion', 'Temp_Exterior_Amb',
                   'Tempcirc_caldera', 'Tempentagua', "Tempcircagua", "Prescircagua",
                   'TempInyecbdtcbc', 'TempBDT1y2', 'HumBDT1y2', 'TempBDT3y4', 'HumBDT3y4',
                    'TempPresBDT4', 'HumPresBDT4', 'SP_TempPresBDT4', 'SP_HumPresBDT4',
                   'TempBDT5', 'HumBDT5', 'TempBDT6', 'HumBDT6',
-                  'Motinyecbdtamp', 'Motinyecbdtpot', 'Motinyecbdthz',
+                  'Motinyecbdtamp', 'Motinyecbdtpot', 'Motinyecbdthz', "MontinyecbdtON",
                   "Automatico_CBCBDT", 'Comp_BDT_Succion', 'Comp_BDT_Exterior', 'Comp_BDT_Recircula',
                   'TempInyecsalon3', 'TempInyecquemsalon3', 'S3temppmax', 'S3humpmax', 'S3temptac', 'S3humtac',
                   'SP_Temp_QS3', 'SP_Temp_S3', 'SP_Humedad_S3',
-                  'Motinyecsal3amp', 'Motinyecsal3pot', 'Motinyecsal3hz',
+                  'Motinyecsal3amp', 'Motinyecsal3pot', 'Motinyecsal3hz', "Montinyecsal3ON",
                   'Automatico_S3', 'Comp_S3_Exterior', 'Comp_S3_Succion',
                   'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla',
                   'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"
@@ -68,6 +72,11 @@ def organize_df(df):
 
     # Round the complete dataframe
     df = df.round(2)
+
+    # Converting to 0/1
+    boolean_list = ['Automatico_CBCBDT', 'Automatico_S3', 'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla']
+    for item in boolean_list:
+        df[item] = df[item].astype(int)
 
     # Sorting the df by the date
     df = df.sort_values(by='fecha', ascending=True)
