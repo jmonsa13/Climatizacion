@@ -103,7 +103,7 @@ def plot_html_Salon3(df, title):
 
     # S3 humedad tac
     fig.add_trace(go.Scatter(x=df.index, y=df["S3humtac"],
-                             line=dict(color='#9467bd', width=0.8, dash='dash'),
+                             line=dict(color='#9467bd', width=1, dash='dot'),
                              mode='lines', name='HR TZ AC',
                              yaxis="y4",
                              ),
@@ -111,7 +111,7 @@ def plot_html_Salon3(df, title):
 
     # S3temppmax
     fig.add_trace(go.Scatter(x=df.index, y=df["S3temppmax"],
-                             line=dict(color='#b68100', width=1.5), # dash='dash'),
+                             line=dict(color='#b68100', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp Power Max',
                              yaxis="y3",
                              ),
@@ -119,7 +119,7 @@ def plot_html_Salon3(df, title):
 
     # S3 humedad power max
     fig.add_trace(go.Scatter(x=df.index, y=df["S3humpmax"],
-                             line=dict(color='#b68100', width=0.8, dash='dash'),
+                             line=dict(color='#b68100', width=1, dash='dot'),
                              mode='lines', name='HR Power Max',
                              yaxis="y4",
                              ),
@@ -127,9 +127,9 @@ def plot_html_Salon3(df, title):
 
     # Set Point temperatura
     fig.add_trace(go.Scatter(x=df.index, y=df["SP_Temp_S3"],
-                             line=dict(color='#7f7f7f', width=2), # dash='dash'),
+                             line=dict(color='#7f7f7f', width=2),  # dash='dash'),
                              mode='lines', name='Set Point Temp',
-                             yaxis="y3",
+                             yaxis="y3", visible="legendonly"
                              ),
                   secondary_y=False, row=2, col=1)
 
@@ -137,7 +137,7 @@ def plot_html_Salon3(df, title):
     fig.add_trace(go.Scatter(x=df.index, y=df["SP_Humedad_S3"],
                              line=dict(color='#7f7f7f', width=2, dash='dash'),
                              mode='lines', name='Set Point HR',
-                             yaxis="y4",
+                             yaxis="y4", visible="legendonly"
                              ),
                   secondary_y=True, row=2, col=1)
 
@@ -230,23 +230,23 @@ def plot_html_CBC_BDT(df, title):
     # ------------------------------------------------------------------------------------------------------------------
     # BDT Temp 1&2
     fig.add_trace(go.Scatter(x=df.index, y=df["TempBDT1y2"],
-                             line=dict(color='#9467bd', width=1.5), # dash='dash'),
+                             line=dict(color='#9467bd', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp BDT 1&2',
-                             yaxis="y3",
+                             yaxis="y3", visible="legendonly"
                              ),
                   row=2, col=1)
 
     # BDT HR 1&2
     fig.add_trace(go.Scatter(x=df.index, y=df["HumBDT1y2"],
-                             line=dict(color='#9467bd', width=0.8, dash='dash'),
+                             line=dict(color='#9467bd', width=1, dash='dot'),
                              mode='lines', name='HR BDT 1&2',
-                             yaxis="y4",
+                             yaxis="y4", visible="legendonly"
                              ),
                   secondary_y=True, row=2, col=1)
 
     # BDT Temp 3&4
     fig.add_trace(go.Scatter(x=df.index, y=df["TempBDT3y4"],
-                             line=dict(color='#b68100', width=1.5), # dash='dash'),
+                             line=dict(color='#b68100', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp BDT 3&4',
                              yaxis="y3",
                              ),
@@ -254,15 +254,63 @@ def plot_html_CBC_BDT(df, title):
 
     # BDT HR 3&4
     fig.add_trace(go.Scatter(x=df.index, y=df["HumBDT3y4"],
-                             line=dict(color='#b68100', width=0.8, dash='dash'),
+                             line=dict(color='#b68100', width=1, dash='dot'),
                              mode='lines', name='HR BDT 3&4',
                              yaxis="y4",
                              ),
                   secondary_y=True, row=2, col=1)
 
+    # BDT Temp 5
+    fig.add_trace(go.Scatter(x=df.index, y=df["TempBDT5"],
+                             line=dict(color='#3366cc', width=1.5),  # dash='dash'),
+                             mode='lines', name='Temp BDT 5',
+                             yaxis="y3", visible="legendonly"
+                             ),
+                  secondary_y=False, row=2, col=1)
+
+    # BDT HR 5
+    fig.add_trace(go.Scatter(x=df.index, y=df["HumBDT5"],
+                             line=dict(color='#3366cc', width=1, dash='dot'),
+                             mode='lines', name='HR BDT 5',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # BDT Temp 6
+    fig.add_trace(go.Scatter(x=df.index, y=df["TempBDT6"],
+                             line=dict(color='#109618', width=1.5),  # dash='dash'),
+                             mode='lines', name='Temp BDT 6',
+                             yaxis="y3", visible="legendonly"
+                             ),
+                  secondary_y=False, row=2, col=1)
+
+    # BDT HR 6
+    fig.add_trace(go.Scatter(x=df.index, y=df["HumBDT6"],
+                             line=dict(color='#109618', width=1, dash='dot'),
+                             mode='lines', name='HR BDT 6',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # # BDT Temp Presecadero BDT4
+    # fig.add_trace(go.Scatter(x=df.index, y=df["TempPresBDT4"],
+    #                          line=dict(color='#d62728', width=1.5),  # dash='dash'),
+    #                          mode='lines', name='Temp Pres BDT 4',
+    #                          yaxis="y3",
+    #                          ),
+    #               secondary_y=False, row=2, col=1)
+    #
+    # # BDT HR Presecadero BDT4
+    # fig.add_trace(go.Scatter(x=df.index, y=df["HumPresBDT4"],
+    #                          line=dict(color='#d62728', width=1, dash='dot'),
+    #                          mode='lines', name='HR Pres BDT 4',
+    #                          yaxis="y4",
+    #                          ),
+    #               secondary_y=True, row=2, col=1)
+
     # Set Point temperatura
     fig.add_trace(go.Scatter(x=df.index, y=df["SP_TempPresBDT4"],
-                             line=dict(color='#7f7f7f', width=2), # dash='dash'),
+                             line=dict(color='#7f7f7f', width=2),  # dash='dash'),
                              mode='lines', name='Set Point Temp 4',
                              yaxis="y3",
                              ),
@@ -270,7 +318,7 @@ def plot_html_CBC_BDT(df, title):
 
     # Set Point humedad
     fig.add_trace(go.Scatter(x=df.index, y=df["SP_HumPresBDT4"],
-                             line=dict(color='#7f7f7f', width=2, dash='dash'),
+                             line=dict(color='#7f7f7f', width=2, dash='dot'),
                              mode='lines', name='Set Point HR 4',
                              yaxis="y4",
                              ),
