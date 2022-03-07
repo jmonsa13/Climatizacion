@@ -45,7 +45,7 @@ def plot_html_Salon3(df, title):
 
     # Temp Ware House
     fig.add_trace(go.Scatter(x=df.index, y=df["Tempwh"],
-                             line=dict(color='#d62728', width=1.5), # dash='dash'),
+                             line=dict(color='#222a2a', width=1.5), # dash='dash'),
                              mode='lines',  # 'lines+markers'
                              name='Temp WH',
                              yaxis="y1",
@@ -54,7 +54,7 @@ def plot_html_Salon3(df, title):
 
     # Temp Succión
     fig.add_trace(go.Scatter(x=df.index, y=df["TempSuccion"],
-                             line=dict(color='#EF553B', width=1.5),
+                             line=dict(color='#d62728', width=1.5),
                              mode='lines',  # 'lines+markers'
                              name='Temp Succión',
                              yaxis="y1",
@@ -95,7 +95,7 @@ def plot_html_Salon3(df, title):
     # ------------------------------------------------------------------------------------------------------------------
     # S3 temptac
     fig.add_trace(go.Scatter(x=df.index, y=df["S3temptac"],
-                             line=dict(color='#9467bd', width=1.2), # dash='dash'),
+                             line=dict(color='#9467bd', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp TZ AC',
                              yaxis="y3",
                              ),
@@ -103,7 +103,7 @@ def plot_html_Salon3(df, title):
 
     # S3 humedad tac
     fig.add_trace(go.Scatter(x=df.index, y=df["S3humtac"],
-                             line=dict(color='#9467bd', width=0.5, dash='dash'),
+                             line=dict(color='#9467bd', width=0.8, dash='dash'),
                              mode='lines', name='HR TZ AC',
                              yaxis="y4",
                              ),
@@ -111,7 +111,7 @@ def plot_html_Salon3(df, title):
 
     # S3temppmax
     fig.add_trace(go.Scatter(x=df.index, y=df["S3temppmax"],
-                             line=dict(color='#b68100', width=1.2), # dash='dash'),
+                             line=dict(color='#b68100', width=1.5), # dash='dash'),
                              mode='lines', name='Temp Power Max',
                              yaxis="y3",
                              ),
@@ -119,7 +119,7 @@ def plot_html_Salon3(df, title):
 
     # S3 humedad power max
     fig.add_trace(go.Scatter(x=df.index, y=df["S3humpmax"],
-                             line=dict(color='#b68100', width=0.5, dash='dash'),
+                             line=dict(color='#b68100', width=0.8, dash='dash'),
                              mode='lines', name='HR Power Max',
                              yaxis="y4",
                              ),
@@ -198,7 +198,7 @@ def plot_html_CBC_BDT(df, title):
 
     # Temp Ware House
     fig.add_trace(go.Scatter(x=df.index, y=df["Tempwh"],
-                             line=dict(color='#d62728', width=1.5), # dash='dash'),
+                             line=dict(color='#222a2a', width=1.5), # dash='dash'),
                              mode='lines',  # 'lines+markers'
                              name='Temp WH',
                              yaxis="y1",
@@ -207,7 +207,7 @@ def plot_html_CBC_BDT(df, title):
 
     # Temp Succión
     fig.add_trace(go.Scatter(x=df.index, y=df["TempSuccion"],
-                             line=dict(color='#EF553B', width=1.5),
+                             line=dict(color='#d62728', width=1.5),
                              mode='lines',  # 'lines+markers'
                              name='Temp Succión',
                              yaxis="y1",
@@ -230,7 +230,7 @@ def plot_html_CBC_BDT(df, title):
     # ------------------------------------------------------------------------------------------------------------------
     # BDT Temp 1&2
     fig.add_trace(go.Scatter(x=df.index, y=df["TempBDT1y2"],
-                             line=dict(color='#9467bd', width=1.2), # dash='dash'),
+                             line=dict(color='#9467bd', width=1.5), # dash='dash'),
                              mode='lines', name='Temp BDT 1&2',
                              yaxis="y3",
                              ),
@@ -238,7 +238,7 @@ def plot_html_CBC_BDT(df, title):
 
     # BDT HR 1&2
     fig.add_trace(go.Scatter(x=df.index, y=df["HumBDT1y2"],
-                             line=dict(color='#9467bd', width=0.5, dash='dash'),
+                             line=dict(color='#9467bd', width=0.8, dash='dash'),
                              mode='lines', name='HR BDT 1&2',
                              yaxis="y4",
                              ),
@@ -246,7 +246,7 @@ def plot_html_CBC_BDT(df, title):
 
     # BDT Temp 3&4
     fig.add_trace(go.Scatter(x=df.index, y=df["TempBDT3y4"],
-                             line=dict(color='#b68100', width=1.2), # dash='dash'),
+                             line=dict(color='#b68100', width=1.5), # dash='dash'),
                              mode='lines', name='Temp BDT 3&4',
                              yaxis="y3",
                              ),
@@ -254,7 +254,7 @@ def plot_html_CBC_BDT(df, title):
 
     # BDT HR 3&4
     fig.add_trace(go.Scatter(x=df.index, y=df["HumBDT3y4"],
-                             line=dict(color='#b68100', width=0.5, dash='dash'),
+                             line=dict(color='#b68100', width=0.8, dash='dash'),
                              mode='lines', name='HR BDT 3&4',
                              yaxis="y4",
                              ),
