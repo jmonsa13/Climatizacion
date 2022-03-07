@@ -46,9 +46,6 @@ with col1:
 
     # Descargar nuevamente flag
     flag_download = False
-    if st.checkbox("Descargar nuevamente"):
-        flag_download = True
-        st.legacy_caching.clear_cache()
 
 with col2:
     # Opciones por día
@@ -100,6 +97,13 @@ if graficar is True:
 # ----------------------------------------------------------------------------------------------------------------------
     if climat == "Salón 3":
         st.header("Climatización Salón 3")
+
+        # Button to refresh the data
+        if st.button("Refrescar gráfica", key="refrescar"):
+            flag_download = True
+            st.legacy_caching.clear_cache()
+            st.experimental_rerun()
+
         # Dibujando la grafica
         with st.spinner('Dibujando la información...'):
             fig = plot_html_Salon3(df, title)
@@ -107,6 +111,13 @@ if graficar is True:
 
     elif climat == "Salón CBC/BDT":
         st.header("Climatización Salón CBC/BDT")
+
+        # Button to refresh the data
+        if st.button("Refrescar gráfica", key="refrescar"):
+            flag_download = True
+            st.legacy_caching.clear_cache()
+            st.experimental_rerun()
+
         # Dibujando la grafica
         with st.spinner('Dibujando la información...'):
             fig = plot_html_CBC_BDT(df, title)
