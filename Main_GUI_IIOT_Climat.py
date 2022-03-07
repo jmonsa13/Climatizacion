@@ -11,6 +11,15 @@ from st_aggrid import AgGrid
 # Internal Function
 from SQL_Function_Climat import get_data_day, get_data_range
 from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# Functions definition
+@st.cache
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 # Streamlit Setting
@@ -70,8 +79,9 @@ st.markdown("""---""")
 # ----------------------------------------------------------------------------------------------------------------------
 # Visualizando la información
 st.subheader("3) Graficar Información")
-descargar = st.checkbox("Graficar", key="climat")
-if descargar is True:
+graficar = st.checkbox("Graficar", key="climat")
+
+if graficar is True:
     # Descargando la información
     with st.spinner('Descargando la información...'):
         if sel_fecha == "Por día":
@@ -90,44 +100,43 @@ if descargar is True:
 # ----------------------------------------------------------------------------------------------------------------------
     if climat == "Salón 3":
         st.header("Climatización Salón 3")
-        # ----------------------------------------------------------------------------------------------------------
         # Dibujando la grafica
         with st.spinner('Dibujando la información...'):
             fig = plot_html_Salon3(df, title)
             st.plotly_chart(fig, use_container_width=True)
-        with st.expander("Ver los datos"):
-            tabla = AgGrid(df,
-                           editable=False,
-                           sortable=True,
-                           filter=True,
-                           resizable=True,
-                           defaultWidth=5,
-                           fit_columns_on_grid_load=False,
-                           theme="streamlit",  # "light", "dark", "blue", "fresh", "material"
-                           key='analisis_table',
-                           reload_data=True,
-                           )
-        st.markdown("""---""")
+
     elif climat == "Salón CBC/BDT":
         st.header("Climatización Salón CBC/BDT")
-        # ----------------------------------------------------------------------------------------------------------
         # Dibujando la grafica
         with st.spinner('Dibujando la información...'):
             fig = plot_html_CBC_BDT(df, title)
             st.plotly_chart(fig, use_container_width=True)
-        with st.expander("Ver los datos"):
-            tabla = AgGrid(df,
-                           editable=False,
-                           sortable=True,
-                           filter=True,
-                           resizable=True,
-                           defaultWidth=5,
-                           fit_columns_on_grid_load=False,
-                           theme="streamlit",  # "light", "dark", "blue", "fresh", "material"
-                           key='analisis_table',
-                           reload_data=True,
-                           )
-        st.markdown("""---""")
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    # Visualización de los datos
+    with st.expander("Ver los datos y descargar"):
+        # Converting to csv file
+        csv = convert_df(df)
+
+        # Button to export the data
+        st.download_button(label="Descargar datos como un archivo *.CSV",
+                           data=csv,
+                           file_name='Raw_datos_climatizacion_GR.csv',
+                           mime='text/csv')
+
+        # Showing the table
+        tabla = AgGrid(df,
+                       editable=False,
+                       sortable=True,
+                       filter=True,
+                       resizable=True,
+                       defaultWidth=5,
+                       fit_columns_on_grid_load=False,
+                       theme="streamlit",  # "light", "dark", "blue", "fresh", "material"
+                       key='analisis_table',
+                       reload_data=True,
+                       )
+    st.markdown("""---""")
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     # Visualizando la información
