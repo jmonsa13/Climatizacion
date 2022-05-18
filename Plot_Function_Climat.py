@@ -495,9 +495,7 @@ def plot_html_CDI(df, title):
 
 
     # Compuerta Succión
-    #fig = plot_on_off(fig, df, "PosCom", "Compuerta", 'rgba(255,127,0,0.3)', axis_y="y4", r=2, c=1)
-
-
+    fig = plot_on_off(fig, df, "PosComp", "Compuerta", 'rgba(255,127,0,0.3)', axis_y="y4", r=2, c=1)
 
     # Add figure title
     fig.update_layout(height=800, title=title)
