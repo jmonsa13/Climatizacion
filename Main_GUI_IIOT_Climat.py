@@ -8,9 +8,9 @@ import datetime
 import streamlit as st
 from st_aggrid import AgGrid
 
+from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT, plot_html_CDI
 # Internal Function
 from SQL_Function_Climat import get_data_day, get_data_range
-from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ st.title(' 📈 IIOT|Corona: Climatización Salones Girardota')
 
 st.markdown("""---""")
 st.header("1) Selección de Salon a Visualizar")
-climat = st.radio("¿Que salon desea visualizar?", ["Salón 3", "Salón CBC/BDT"], 0)
+climat = st.radio("¿Que salon desea visualizar?", ["Salón 3", "Salón CBC/BDT", "Salón CDI"], 0)
 st.markdown("""---""")
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -82,11 +82,10 @@ if graficar is True:
     # Descargando la información
     with st.spinner('Descargando la información...'):
         if sel_fecha == "Por día":
-            df, salud_list, salud_datos, title = get_data_day(sel_dia, flag_download)
+            df, salud_list, salud_datos, title = get_data_day(sel_dia, climat, flag_download)
             text_dia = str(sel_dia)
         elif sel_fecha == "Por rango de días":
-            df, salud_list, salud_datos, title = get_data_range(sel_dia_ini, sel_dia_fin,
-                                                                     flag_download)
+            df, salud_list, salud_datos, title = get_data_range(sel_dia_ini, sel_dia_fin, climat, flag_download)
             text_dia = "from_" + str(sel_dia_ini) + "_to_" + str(sel_dia_fin)
         # ----------------------------------------------------------------------------------------------------------
         # Salud de los datos descargada
@@ -121,6 +120,20 @@ if graficar is True:
         # Dibujando la grafica
         with st.spinner('Dibujando la información...'):
             fig = plot_html_CBC_BDT(df, title)
+            st.plotly_chart(fig, use_container_width=True)
+
+    elif climat == "Salón CDI":
+        st.header("Climatización Salón CDI")
+        pass
+        # Button to refresh the data
+        if st.button("Refrescar gráfica", key="refrescar"):
+            flag_download = True
+            st.legacy_caching.clear_cache()
+            st.experimental_rerun()
+
+        # Dibujando la grafica
+        with st.spinner('Dibujando la información...'):
+            fig = plot_html_CDI(df, title)
             st.plotly_chart(fig, use_container_width=True)
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

@@ -11,7 +11,6 @@ import pyodbc
 import streamlit as st
 
 
-from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT
 # ----------------------------------------------------------------------------------------------------------------------
 # Function definition
 @st.experimental_memo(suppress_st_warning=True, show_spinner=True)
@@ -24,12 +23,13 @@ def load_data(folder="./Data/Raw/", filename="tabla_robot1_2021_04_22_1012.csv")
     return df
 
 
-def organize_df(df):
+def organize_df(df, sql_table="Salón 3"):
     """
     Función que organiza el data frame, generando nuevas columnas de informaciónd e fechas, reorganizando las columnas
     y redodeando los valores a 2 cifras decimales.
     INPUT:
         df = data frame original
+        sql_table = Selección de la tabla SQL de climatización a la que se conectara
     OUTPUT:
         df = data frame  reorganizado
     """
@@ -49,34 +49,61 @@ def organize_df(df):
     df["fecha_planta"] = [elem - datetime.timedelta(days=1) if df["hora"].iloc[x] < 6 else elem for x, elem in
                           enumerate(df["fecha"])]
 
-    # Creo columna de encendido ventiladores
-    df["MontinyecbdtON"] = [1 if i > 0 else 0 for i in df["Motinyecbdthz"]]
-    df["Montinyecsal3ON"] = [1 if i > 0 else 0 for i in df["Motinyecsal3hz"]]
+    if sql_table in ["Salón 3", "Salón CBC/BDT"]:
+        # Creo columna de encendido ventiladores
+        df["MontinyecbdtON"] = [1 if i > 0 else 0 for i in df["Motinyecbdthz"]]
+        df["Montinyecsal3ON"] = [1 if i > 0 else 0 for i in df["Motinyecsal3hz"]]
 
-    # Organizo las columnas
-    re_columns = ['fecha', 'Tempwh', 'TempSuccion', 'Temp_Exterior_Amb',
-                  'Tempcirc_caldera', 'Tempentagua', "Tempcircagua", "Prescircagua",
-                  'TempInyecbdtcbc', 'TempBDT1y2', 'HumBDT1y2', 'TempBDT3y4', 'HumBDT3y4',
-                   'TempPresBDT4', 'HumPresBDT4', 'SP_TempPresBDT4', 'SP_HumPresBDT4',
-                  'TempBDT5', 'HumBDT5', 'TempBDT6', 'HumBDT6',
-                  'Motinyecbdtamp', 'Motinyecbdtpot', 'Motinyecbdthz', "MontinyecbdtON",
-                  "Automatico_CBCBDT", 'Comp_BDT_Succion', 'Comp_BDT_Exterior', 'Comp_BDT_Recircula',
-                  'TempInyecsalon3', 'TempInyecquemsalon3', 'S3temppmax', 'S3humpmax', 'S3temptac', 'S3humtac',
-                  'SP_Temp_QS3', 'SP_Temp_S3', 'SP_Humedad_S3',
-                  'Motinyecsal3amp', 'Motinyecsal3pot', 'Motinyecsal3hz', "Montinyecsal3ON",
-                  'Automatico_S3', 'Comp_S3_Exterior', 'Comp_S3_Succion',
-                  'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla',
-                  'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"
-                  ]
-    df = df[re_columns]
+        # Organizo las columnas
+        re_columns = ['fecha', 'Tempwh', 'TempSuccion', 'Temp_Exterior_Amb',
+                      'Tempcirc_caldera', 'Tempentagua', "Tempcircagua", "Prescircagua",
+                      'TempInyecbdtcbc', 'TempBDT1y2', 'HumBDT1y2', 'TempBDT3y4', 'HumBDT3y4',
+                       'TempPresBDT4', 'HumPresBDT4', 'SP_TempPresBDT4', 'SP_HumPresBDT4',
+                      'TempBDT5', 'HumBDT5', 'TempBDT6', 'HumBDT6',
+                      'Motinyecbdtamp', 'Motinyecbdtpot', 'Motinyecbdthz', "MontinyecbdtON",
+                      "Automatico_CBCBDT", 'Comp_BDT_Succion', 'Comp_BDT_Exterior', 'Comp_BDT_Recircula',
+                      'TempInyecsalon3', 'TempInyecquemsalon3', 'S3temppmax', 'S3humpmax', 'S3temptac', 'S3humtac',
+                      'SP_Temp_QS3', 'SP_Temp_S3', 'SP_Humedad_S3',
+                      'Motinyecsal3amp', 'Motinyecsal3pot', 'Motinyecsal3hz', "Montinyecsal3ON",
+                      'Automatico_S3', 'Comp_S3_Exterior', 'Comp_S3_Succion',
+                      'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla',
+                      'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"
+                      ]
+        df = df[re_columns]
 
-    # Round the complete dataframe
-    df = df.round(2)
+        # Round the complete dataframe
+        df = df.round(2)
 
-    # Converting to 0/1
-    boolean_list = ['Automatico_CBCBDT', 'Automatico_S3', 'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla']
-    for item in boolean_list:
-        df[item] = df[item].astype(int)
+        # Converting to 0/1
+        boolean_list = ['Automatico_CBCBDT', 'Automatico_S3', 'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla']
+        for item in boolean_list:
+            df[item] = df[item].astype(int)
+
+    elif sql_table == "Salón CDI":
+        # Organizo las columnas
+        re_columns = ['fecha', 'Tempwh', 'CDITempprom', 'CDISPTemp', 'CDISPHum', 'CDITempz1', 'CDIHumz1', 'CDITempz2',
+                      'CDIHumz2', 'CDISPW', 'CDIWZ1','CDIWZ2',
+                      'CDIPosComp', 'CDIVentInyec',
+                      'Extrac1', 'Extrac2', 'Extrac3',
+                      'Extrac4', 'Extrac5', 'Extrac6',
+                      'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"]
+        df = df[re_columns]
+
+        # Renaming the columns
+        df.columns = ['fecha', 'Tempwh', 'TempProm', 'SPTemp', 'SPHum', 'TempZ1', 'HumZ1', 'TempZ2', 'HumZ2',
+                      'SPW', 'WZ1','WZ2',
+                      'PosComp', 'VentInyec',
+                      'Extrac1', 'Extrac2', 'Extrac3',
+                      'Extrac4', 'Extrac5', 'Extrac6',
+                      'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"]
+
+        # Round the complete dataframe
+        df = df.round(2)
+
+        # Converting to 0/1
+        boolean_list = ['VentInyec', 'Extrac1', 'Extrac2', 'Extrac3', 'Extrac4', 'Extrac5', 'Extrac6']
+        for item in boolean_list:
+            df[item] = df[item].astype(int)
 
     # Sorting the df by the date
     df = df.sort_values(by='fecha', ascending=True)
@@ -104,11 +131,12 @@ def add_day(day, add=1):
 
 
 @st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
-def get_data_day(sel_dia="2022-01-01", flag_download=False):
+def get_data_day(sel_dia="2022-01-01", sql_table="Salón 3", flag_download=False):
     """
     Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
     INPUT:
         sel_dia = Día inicial EN STR
+        sql_table = Selección de la tabla SQL de climatización a la que se conectara
         redownload = Debe descargarse la data o buscar dentro de los archivos previamente descargados.
     OUTPUT:
         df = pandas dataframe traído de la base de dato SQL
@@ -120,9 +148,15 @@ def get_data_day(sel_dia="2022-01-01", flag_download=False):
     datos_días = 24 * 60 * 2  # 24 horas en un día x 60 minutos en cada hora x 2 veces que tomo el dato cada minuto
 
     # Conexión a la base de datos SQL
-    df = find_load(tipo="day_planta", day=str(sel_dia), ini=None, database="CLIMATI",
-                   table="CLIMATI", redownload=flag_download)
-    df = organize_df(df)
+    if sql_table in ["Salón 3", "Salón CBC/BDT"]:
+        df = find_load(tipo="day_planta", day=str(sel_dia), ini=None, database="CLIMATI",
+                       table="CLIMATI", redownload=flag_download)
+    elif sql_table == "Salón CDI":
+        df = find_load(tipo="day_planta", day=str(sel_dia), ini=None, database="CLIMATI",
+                       table="CLIMATI_CDI", redownload=flag_download)
+
+    # Organizing the raw DF
+    df = organize_df(df, sql_table)
 
     # Defining the title and filename for saving the plots
     title = "Variables de Climatización Día " + str(sel_dia)
@@ -135,13 +169,14 @@ def get_data_day(sel_dia="2022-01-01", flag_download=False):
 
 
 @st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
-def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", flag_download=False):
+def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", sql_table="Salón 3", flag_download=False):
     """
     Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
     del periodo de fecha ingresado
     INPUT:
         sel_dia_ini = Día inicial en STR ("2022-01-01")
         sel_dia_fin = Día final en STR ("2022-01-02")
+        sql_table = Selección de la tabla SQL de climatización a la que se conectara
         redownload = Debe descargarse la data o buscar dentro de los archivos previamente descargados
     OUTPUT:
         df = pandas dataframe traído de la base de dato SQL
@@ -153,10 +188,14 @@ def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", flag_down
     datos_días = 24 * 60 * 2  # 24 horas en un día x 60 minutos en cada hora x 2 veces que tomo el dato cada minuto
 
     # Conexión a la base de datos SQL
-    # Conexión y manejo robot 1 o robot 2
-    df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
-                   table="CLIMATI", redownload=flag_download)
-    df = organize_df(df)
+    if sql_table in ["Salón 3", "Salón CBC/BDT"]:
+        df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
+                       table="CLIMATI", redownload=flag_download)
+        df = organize_df(df)
+    elif sql_table == "Salón CDI":
+        df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
+                       table="CLIMATI_CDI", redownload=flag_download)
+        pass
 
     # Defining the title and filename for saving the plots
     title = "Variables de Climatización entre " + str(sel_dia_ini) + " y " + str(sel_dia_fin)

@@ -362,3 +362,168 @@ def plot_html_CBC_BDT(df, title):
     fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')
 
     return fig
+
+@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
+def plot_html_CDI(df, title):
+    """
+    Función para dibujar los datos de temperatura de los salones CDI
+    INPUT:
+        df = pandas dataframe traído de la base de dato SQL
+        title = Título de la gráfica
+    OUTPUT:
+        fig = objeto figura para dibujarlo externamente de la función
+    """
+    # Create figure with secondary y-axis
+    fig = make_subplots(rows=2, cols=1,  specs=[[{"secondary_y": True}], [{"secondary_y": True}]],
+                        shared_xaxes=True, vertical_spacing=0.02,
+                        #subplot_titles=('Temperaturas Entradas',  'Temperatura y humedad Salon 3')
+                        )
+
+    # Automatico ON/OFF
+    #fig = plot_on_off(fig, df, "Automatico_CBCBDT", "Manual ON", 'rgba(0,0,0,0.5)', visibility=None)
+
+    # Temp Ware House
+    fig.add_trace(go.Scatter(x=df.index, y=df["Tempwh"],
+                             line=dict(color='#222a2a', width=1.5), # dash='dash'),
+                             mode='lines',  # 'lines+markers'
+                             name='Temp WH',
+                             yaxis="y1",
+                             ),
+                  row=1, col=1,)
+
+    # Temp Succión
+    # fig.add_trace(go.Scatter(x=df.index, y=df["TempSuccion"],
+    #                          line=dict(color='#d62728', width=1.5),
+    #                          mode='lines',  # 'lines+markers'
+    #                          name='Temp Succión',
+    #                          yaxis="y1",
+    #                          ),
+    #               row=1, col=1)
+
+    # Ventilador ON/OFF
+    fig = plot_on_off(fig, df, "VentInyec", "Ventilador ON", 'rgba(55,126,184,0.2)')
+
+    # Extractores
+    fig = plot_on_off(fig, df, "Extrac1", "Extractor1 ON", 'rgba(255, 127, 14,0.2)')
+    fig = plot_on_off(fig, df, "Extrac2", "Extractor2 ON", 'rgba(228,26,28,0.2)')
+    fig = plot_on_off(fig, df, "Extrac3", "Extractor3 ON", 'rgba(102,17,0,0.3)')
+    fig = plot_on_off(fig, df, "Extrac4", "Extractor4 ON", 'rgba(23, 190, 207,0.2)')
+    fig = plot_on_off(fig, df, "Extrac5", "Extractor5 ON", 'rgba(188, 189, 34,0.2)')
+    fig = plot_on_off(fig, df, "Extrac6", "Extractor6 ON", 'rgba(148, 103, 189,0.2)')
+    # ------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+    # Temp Zona1
+    fig.add_trace(go.Scatter(x=df.index, y=df["TempZ1"],
+                             line=dict(color='#1616a7', width=1.5),  # dash='dash'),
+                             mode='lines', name='Temp Zona1',
+                             yaxis="y3",
+                             ),
+                  row=2, col=1)
+
+    # HR Zona1
+    fig.add_trace(go.Scatter(x=df.index, y=df["HumZ1"],
+                             line=dict(color='#1616a7', width=1, dash='dot'),
+                             mode='lines', name='HR Zona1',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # Humedad absoluta Z1
+    fig.add_trace(go.Scatter(x=df.index, y=df["WZ1"],
+                             line=dict(color='#1616a7', width=2, dash='dash'),
+                             mode='lines', name='Humedad Abs Z1',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # Temp Zona2
+    fig.add_trace(go.Scatter(x=df.index, y=df["TempZ2"],
+                             line=dict(color='#d62728', width=1.5),  # dash='dash'),
+                             mode='lines', name='Temp Zona2',
+                             yaxis="y3",
+                             ),
+                  secondary_y=False, row=2, col=1)
+
+    # HR Zona2
+    fig.add_trace(go.Scatter(x=df.index, y=df["HumZ2"],
+                             line=dict(color='#d62728', width=1, dash='dot'),
+                             mode='lines', name='HR Zona2',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # Humedad absoluta Z2
+    fig.add_trace(go.Scatter(x=df.index, y=df["WZ2"],
+                             line=dict(color='#d62728', width=2, dash='dash'),
+                             mode='lines', name='Humedad Abs Z2',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # TempProm
+    fig.add_trace(go.Scatter(x=df.index, y=df["TempProm"],
+                             line=dict(color='#3366cc', width=1.5),  # dash='dash'),
+                             mode='lines', name='Temp Promedio',
+                             yaxis="y3", visible="legendonly"
+                             ),
+                  secondary_y=False, row=2, col=1)
+
+
+    # Set Point temperatura
+    fig.add_trace(go.Scatter(x=df.index, y=df["SPTemp"],
+                             line=dict(color='#7f7f7f', width=2),  # dash='dash'),
+                             mode='lines', name='Set Point Temp',
+                             yaxis="y3",
+                             ),
+                  secondary_y=False, row=2, col=1)
+
+    # Set Point humedad
+    fig.add_trace(go.Scatter(x=df.index, y=df["SPHum"],
+                             line=dict(color='#7f7f7f', width=2, dash='dot'),
+                             mode='lines', name='Set Point HR',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # Set Point humedad Absoluta
+    fig.add_trace(go.Scatter(x=df.index, y=df["SPW"],
+                             line=dict(color='#7f7f7f', width=2, dash='dash'),
+                             mode='lines', name='Set Point HA',
+                             yaxis="y4", visible="legendonly"
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+
+    # Compuerta Succión
+    #fig = plot_on_off(fig, df, "PosCom", "Compuerta", 'rgba(255,127,0,0.3)', axis_y="y4", r=2, c=1)
+
+
+
+    # Add figure title
+    fig.update_layout(height=800, title=title)
+
+    # Template
+    fig.layout.template = 'seaborn'  # ggplot2, plotly_dark, seaborn, plotly, plotly_white
+    fig.update_layout(modebar_add=["v1hovermode", "toggleSpikeLines"])
+
+    # Set x-axis and y-axis title
+    fig.update_layout(legend_title_text='Variables Salón CDI')
+    fig['layout']['xaxis2']['title'] = 'Fecha'
+
+    fig['layout']['yaxis']['title'] = 'Temperaturas Entrada °C'
+
+    fig['layout']['yaxis2']['title'] = 'Estado ON/OFF'
+    fig['layout']['yaxis2']['range'] = [0, 1]
+    fig['layout']['yaxis2']['fixedrange'] = True
+
+    fig['layout']['yaxis3']['title'] = 'Temperaturas Salon CDI °C'
+    fig['layout']['yaxis3']['range'] = [20, 35]
+    fig['layout']['yaxis3']['fixedrange'] = True
+
+    fig['layout']['yaxis4']['title'] = 'Apertura Compuerta y HR %'
+    fig['layout']['yaxis4']['range'] = [0, 85]
+
+    fig.update_xaxes(showline=True, linewidth=0.5, linecolor='black')
+    fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')
+
+    return fig
