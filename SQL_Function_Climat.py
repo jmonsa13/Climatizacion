@@ -191,11 +191,12 @@ def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", sql_table
     if sql_table in ["Salón 3", "Salón CBC/BDT"]:
         df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
                        table="CLIMATI", redownload=flag_download)
-        df = organize_df(df)
     elif sql_table == "Salón CDI":
         df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
                        table="CLIMATI_CDI", redownload=flag_download)
-        pass
+
+    # Organizing the raw DF
+    df = organize_df(df, sql_table)
 
     # Defining the title and filename for saving the plots
     title = "Variables de Climatización entre " + str(sel_dia_ini) + " y " + str(sel_dia_fin)
