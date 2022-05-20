@@ -416,7 +416,7 @@ def plot_html_CDI(df, title):
     fig.add_trace(go.Scatter(x=df.index, y=df["TempZ1"],
                              line=dict(color='#1616a7', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp Zona1',
-                             yaxis="y3",
+                             yaxis="y3", visible="legendonly"
                              ),
                   row=2, col=1)
 
@@ -440,7 +440,7 @@ def plot_html_CDI(df, title):
     fig.add_trace(go.Scatter(x=df.index, y=df["TempZ2"],
                              line=dict(color='#d62728', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp Zona2',
-                             yaxis="y3",
+                             yaxis="y3", visible="legendonly"
                              ),
                   secondary_y=False, row=2, col=1)
 
@@ -464,9 +464,25 @@ def plot_html_CDI(df, title):
     fig.add_trace(go.Scatter(x=df.index, y=df["TempProm"],
                              line=dict(color='#3366cc', width=1.5),  # dash='dash'),
                              mode='lines', name='Temp Promedio',
-                             yaxis="y3", visible="legendonly"
+                             yaxis="y3"
                              ),
                   secondary_y=False, row=2, col=1)
+
+    # HR Prom
+    fig.add_trace(go.Scatter(x=df.index, y=(df["HumZ1"] + df["HumZ2"])/2,
+                             line=dict(color='#3366cc', width=1, dash='dot'),
+                             mode='lines', name='HR Promedio',
+                             yaxis="y4",
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+    # HA Prom
+    fig.add_trace(go.Scatter(x=df.index, y=(df["WZ1"] + df["WZ2"])/2,
+                             line=dict(color='#3366cc', width=1, dash='dash'),
+                             mode='lines', name='HA Promedio',
+                             yaxis="y4",
+                             ),
+                  secondary_y=True, row=2, col=1)
 
 
     # Set Point temperatura
@@ -481,7 +497,7 @@ def plot_html_CDI(df, title):
     fig.add_trace(go.Scatter(x=df.index, y=df["SPHum"],
                              line=dict(color='#7f7f7f', width=2, dash='dot'),
                              mode='lines', name='Set Point HR',
-                             yaxis="y4", visible="legendonly"
+                             yaxis="y4",
                              ),
                   secondary_y=True, row=2, col=1)
 
@@ -489,7 +505,7 @@ def plot_html_CDI(df, title):
     fig.add_trace(go.Scatter(x=df.index, y=df["SPW"],
                              line=dict(color='#7f7f7f', width=2, dash='dash'),
                              mode='lines', name='Set Point HA',
-                             yaxis="y4", visible="legendonly"
+                             yaxis="y4",
                              ),
                   secondary_y=True, row=2, col=1)
 
@@ -511,15 +527,15 @@ def plot_html_CDI(df, title):
     fig['layout']['yaxis']['title'] = 'Temperaturas Entrada °C'
 
     fig['layout']['yaxis2']['title'] = 'Estado ON/OFF'
-    fig['layout']['yaxis2']['range'] = [0, 1]
+    fig['layout']['yaxis2']['range'] = [0, 2]
     fig['layout']['yaxis2']['fixedrange'] = True
 
     fig['layout']['yaxis3']['title'] = 'Temperaturas Salon CDI °C'
     fig['layout']['yaxis3']['range'] = [20, 35]
     fig['layout']['yaxis3']['fixedrange'] = True
 
-    fig['layout']['yaxis4']['title'] = 'Apertura Compuerta y HR %'
-    fig['layout']['yaxis4']['range'] = [0, 85]
+    fig['layout']['yaxis4']['title'] = 'Apertura Compuerta, HR y HA %'
+    fig['layout']['yaxis4']['range'] = [0, 100]
 
     fig.update_xaxes(showline=True, linewidth=0.5, linecolor='black')
     fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')
