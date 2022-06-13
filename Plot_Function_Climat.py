@@ -82,6 +82,9 @@ def plot_html_Salon3(df, title):
     # Ventilador ON/OFF
     fig = plot_on_off(fig, df, "Montinyecsal3ON", "Ventilador ON", 'rgba(55,126,184,0.2)')
 
+    # Extractor ON/OFF
+    fig = plot_on_off(fig, df, "ExtS3Estado", "Extractor ON", 'rgba(255,127,0,0.3)')
+
     # QS3ON_PLC
     fig = plot_on_off(fig, df, "QS3ON_PLC", "Quemador ON PLC", 'rgba(102,102,102,0.2)')
 

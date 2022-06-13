@@ -65,7 +65,7 @@ def organize_df(df, sql_table="Salón 3"):
                       'TempInyecsalon3', 'TempInyecquemsalon3', 'S3temppmax', 'S3humpmax', 'S3temptac', 'S3humtac',
                       'SP_Temp_QS3', 'SP_Temp_S3', 'SP_Humedad_S3',
                       'Motinyecsal3amp', 'Motinyecsal3pot', 'Motinyecsal3hz', "Montinyecsal3ON",
-                      'Automatico_S3', 'Comp_S3_Exterior', 'Comp_S3_Succion',
+                      'Automatico_S3', 'Comp_S3_Exterior', 'Comp_S3_Succion', 'ExtS3Estado',
                       'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla',
                       'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"
                       ]
@@ -75,7 +75,8 @@ def organize_df(df, sql_table="Salón 3"):
         df = df.round(2)
 
         # Converting to 0/1
-        boolean_list = ['Automatico_CBCBDT', 'Automatico_S3', 'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla']
+        df['ExtS3Estado'] = df['ExtS3Estado'].fillna(value=False)
+        boolean_list = ['Automatico_CBCBDT', 'Automatico_S3', 'QS3ON_PLC', 'QS3On_Confirm', 'QS3Falla', 'ExtS3Estado']
         for item in boolean_list:
             df[item] = df[item].astype(int)
 
