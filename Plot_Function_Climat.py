@@ -652,7 +652,7 @@ def plot_html_agua(df, title):
     fig['layout']['xaxis2']['title'] = 'Fecha'
 
     fig['layout']['yaxis']['title'] = 'Temperaturas Agua °C'
-    fig['layout']['yaxis']['range'] = [60, 140]
+    fig['layout']['yaxis']['range'] = [20, 120]
 
     fig['layout']['yaxis2']['title'] = 'Presión Agua Psi'
     fig['layout']['yaxis2']['range'] = [0, 100]
