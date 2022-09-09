@@ -8,7 +8,7 @@ from plotly.subplots import make_subplots
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-def plot_on_off(fig, df, column, legend, rgb, visibility="legendonly", axis_y="y2", r=1, c=1):
+def plot_on_off(fig, df, column, legend, rgb, visibility="legendonly", second_y=True,  axis_y="y2", r=1, c=1):
 
     fig.add_trace(go.Scatter(x=df.index, y=df[column],
                              fill='tozeroy', mode="lines",
@@ -19,7 +19,7 @@ def plot_on_off(fig, df, column, legend, rgb, visibility="legendonly", axis_y="y
                              name=legend,
                              yaxis=axis_y,
                              visible=visibility)
-                  , secondary_y=True, row=r, col=c)
+                  , secondary_y=second_y, row=r, col=c)
 
     return fig
 
@@ -539,6 +539,129 @@ def plot_html_CDI(df, title):
 
     fig['layout']['yaxis4']['title'] = 'Apertura Compuerta, HR y HA %'
     fig['layout']['yaxis4']['range'] = [0, 100]
+
+    fig.update_xaxes(showline=True, linewidth=0.5, linecolor='black')
+    fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')
+
+    return fig
+
+@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
+def plot_html_agua(df, title):
+    """
+    Función para dibujar los datos de temperatura del circuito de agua
+    INPUT:
+        df = pandas dataframe traído de la base de dato SQL
+        title = Título de la gráfica
+    OUTPUT:
+        fig = objeto figura para dibujarlo externamente de la función
+    """
+    # Create figure with secondary y-axis
+    fig = make_subplots(rows=2, cols=1,  specs=[[{"secondary_y": True}], [{"secondary_y": True}]],
+                        shared_xaxes=True, vertical_spacing=0.02,
+                        #subplot_titles=('Temperaturas Entradas',  'Temperatura y humedad Salon 3')
+                        )
+
+    # Automatico ON/OFF
+    # fig = plot_on_off(fig, df, "Automatico_S3", "Manual ON", 'rgba(0,0,0,0.5)', visibility=None)
+
+    # Temp Circulación Caldera
+    fig.add_trace(go.Scatter(x=df.index, y=df["Tempcirc_caldera"],
+                             line=dict(color='#d62728', width=1.5), # dash='dash'),
+                             mode='lines',  # 'lines+markers'
+                             name='Temp Cir Caldera',
+                             yaxis="y1",
+                             ),
+                  row=1, col=1,)
+
+    # Temp Entrada Agua
+    fig.add_trace(go.Scatter(x=df.index, y=df["Tempentagua"],
+                             line=dict(color='#ff9900', width=1.5),
+                             mode='lines',  # 'lines+markers'
+                             name='Temp Ent Agua',
+                             yaxis="y1",
+                             ),
+                  row=1, col=1)
+
+    # Temp Circulación Agua
+    fig.add_trace(go.Scatter(x=df.index, y=df["Tempcircagua"],
+                             line=dict(color='#1616a7', width=1.5),
+                             mode='lines',  # 'lines+markers'
+                             name='Temp Circ Agua',
+                             yaxis="y1",
+                             ),
+                  row=1, col=1)
+
+    # Set Point Agua
+    fig.add_trace(go.Scatter(x=df.index, y=df["SP_Temp_Agua"],
+                             line=dict(color='#1616a7', width=1.5, dash='dash'),
+                             mode='lines',  # 'lines+markers'
+                             name='Set Point Temp Agua',
+                             yaxis="y1",
+                             ),
+                  row=1, col=1)
+
+    # Presión
+    fig.add_trace(go.Scatter(x=df.index, y=df["Prescircagua"],
+                             line=dict(color='#7f7f7f', width=1.5),
+                             mode='lines',  # 'lines+markers'
+                             name='Presión Circ Agua',
+                             yaxis="y2",
+                             ),
+                  secondary_y=True, row=1, col=1)
+
+    # Set Point Presión
+    fig.add_trace(go.Scatter(x=df.index, y=df["SP_Presion_Agua"],
+                             line=dict(color='#7f7f7f', width=1.5, dash='dot'),
+                             mode='lines',  # 'lines+markers'
+                             name='Set Point Presión Agua',
+                             yaxis="y2",
+                             ),
+                  secondary_y=True, row=1, col=1)
+
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+    # Valv_Temp_agua
+    fig = plot_on_off(fig, df, "Valv_Temp_agua", "Válvula Temp Agua", 'rgba(55,126,184,0.2)', visibility=True,
+                      second_y=False, axis_y="y3", r=2, c=1)
+
+
+    # Valv_Presion_agua
+    fig = plot_on_off(fig, df, "Valv_Presion_agua", "Válvula Presión Agua", 'rgba(0,0,0,0.1)', visibility=True,
+                      second_y=False, axis_y="y3", r=2, c=1)
+
+
+    # Velbomba
+    fig.add_trace(go.Scatter(x=df.index, y=df["Velbomba"],
+                             line=dict(color='#9467bd', width=1.5),
+                             mode='lines', name='Velocidad Bomba',
+                             yaxis="y4",
+                             ),
+                  secondary_y=True, row=2, col=1)
+
+
+    # Add figure title
+    fig.update_layout(height=800, title=title)
+
+    # Template
+    fig.layout.template = 'seaborn'  # ggplot2, plotly_dark, seaborn, plotly, plotly_white
+    fig.update_layout(modebar_add=["v1hovermode", "toggleSpikeLines"])
+
+    # Set x-axis and y-axis title
+    fig.update_layout(legend_title_text='Variables Circuito Agua')
+    fig['layout']['xaxis2']['title'] = 'Fecha'
+
+    fig['layout']['yaxis']['title'] = 'Temperaturas Agua °C'
+    fig['layout']['yaxis']['range'] = [60, 140]
+
+    fig['layout']['yaxis2']['title'] = 'Presión Agua Psi'
+    fig['layout']['yaxis2']['range'] = [0, 100]
+
+    fig['layout']['yaxis3']['title'] = 'Apertura Válvula %'
+    fig['layout']['yaxis3']['range'] = [0, 100]
+
+    fig['layout']['yaxis4']['title'] = 'Velocidad Bomba Hz'
+    fig['layout']['yaxis4']['range'] = [20, 80]
 
     fig.update_xaxes(showline=True, linewidth=0.5, linecolor='black')
     fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')

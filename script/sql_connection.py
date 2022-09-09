@@ -39,12 +39,12 @@ conn = create_engine(connection_url)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Modify a column
-# conn.execute(sa_text('''ALTER TABLE %s ALTER COLUMN descripcion VARCHAR(600)''' % table).execution_options(autocommit=True))
+# conn.execute(sa_text('''ALTER TABLE %s ALTER COLUMN SP_Presion_Agua REAL''' % table).execution_options(autocommit=True))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Adding a column
 # conn.execute(sa_text('''ALTER TABLE %s ADD id_averia UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID()''' % table).execution_options(autocommit=True))
-# conn.execute(sa_text('''ALTER TABLE %s ADD Velbomba REAL ''' % table).execution_options(autocommit=True))
+# conn.execute(sa_text('''ALTER TABLE %s ADD Valv_Presion_agua REAL ''' % table).execution_options(autocommit=True))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Update a row
@@ -65,8 +65,10 @@ for table_name in inspector.get_table_names():
 #df.to_sql(table, conn, if_exists='append', index=False)
 
 # Read SQL
-day = '2022-09-05'
+day = '2022-09-09'
 pd_sql = pd.read_sql_query("SELECT * FROM " + database + ".dbo." + table + " WHERE fecha like '" + day + "'", conn)
 # pd_sql = pd.read_sql_query("SELECT * FROM " + database + ".dbo." + table, conn)
 
 pd_sql.to_csv('test.csv', index=False)
+# pd_sql.to_excel('Climati_salon3_CBC.xlsx', index=False)
+

@@ -8,8 +8,8 @@ import datetime
 import streamlit as st
 from st_aggrid import AgGrid
 
-from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT, plot_html_CDI
 # Internal Function
+from Plot_Function_Climat import plot_html_Salon3, plot_html_CBC_BDT, plot_html_CDI, plot_html_agua
 from SQL_Function_Climat import get_data_day, get_data_range
 
 
@@ -34,7 +34,7 @@ st.title(' 📈 IIOT|Corona: Climatización Salones Girardota')
 
 st.markdown("""---""")
 st.header("1) Selección de Salon a Visualizar")
-climat = st.radio("¿Que salon desea visualizar?", ["Salón 3", "Salón CBC/BDT", "Salón CDI"], 0)
+climat = st.radio("¿Que salon desea visualizar?", ["Circuito Agua", "Salón 3", "Salón CBC/BDT", "Salón CDI"], 1)
 st.markdown("""---""")
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -134,6 +134,20 @@ if graficar is True:
         # Dibujando la grafica
         with st.spinner('Dibujando la información...'):
             fig = plot_html_CDI(df, title)
+            st.plotly_chart(fig, use_container_width=True)
+
+    elif climat == "Circuito Agua":
+        st.header("Circuito Agua Caliente Tanque")
+        pass
+        # Button to refresh the data
+        if st.button("Refrescar gráfica", key="refrescar"):
+            flag_download = True
+            st.legacy_caching.clear_cache()
+            st.experimental_rerun()
+
+        # Dibujando la grafica
+        with st.spinner('Dibujando la información...'):
+            fig = plot_html_agua(df, title)
             st.plotly_chart(fig, use_container_width=True)
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

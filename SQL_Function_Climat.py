@@ -149,7 +149,7 @@ def get_data_day(sel_dia="2022-01-01", sql_table="Salón 3", flag_download=False
     datos_días = 24 * 60 * 2  # 24 horas en un día x 60 minutos en cada hora x 2 veces que tomo el dato cada minuto
 
     # Conexión a la base de datos SQL
-    if sql_table in ["Salón 3", "Salón CBC/BDT"]:
+    if sql_table in ["Circuito Agua", "Salón 3", "Salón CBC/BDT"]:
         df = find_load(tipo="day_planta", day=str(sel_dia), ini=None, database="CLIMATI",
                        table="CLIMATI", redownload=flag_download)
     elif sql_table == "Salón CDI":
@@ -189,7 +189,7 @@ def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", sql_table
     datos_días = 24 * 60 * 2  # 24 horas en un día x 60 minutos en cada hora x 2 veces que tomo el dato cada minuto
 
     # Conexión a la base de datos SQL
-    if sql_table in ["Salón 3", "Salón CBC/BDT"]:
+    if sql_table in ["Circuito Agua", "Salón 3", "Salón CBC/BDT"]:
         df = find_load(tipo="rango_planta", ini=str(sel_dia_ini), day=str(sel_dia_fin), database="CLIMATI",
                        table="CLIMATI", redownload=flag_download)
     elif sql_table == "Salón CDI":
