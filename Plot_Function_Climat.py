@@ -377,7 +377,8 @@ def plot_html_CDI(df, title):
         fig = objeto figura para dibujarlo externamente de la función
     """
     # Create figure with secondary y-axis
-    fig = make_subplots(rows=2, cols=1,  specs=[[{"secondary_y": True}], [{"secondary_y": True}]],
+    fig = make_subplots(rows=3, cols=1,  specs=[[{"secondary_y": True}],
+                                                [{"secondary_y": True}], [{"secondary_y": True}]],
                         shared_xaxes=True, vertical_spacing=0.02,
                         #subplot_titles=('Temperaturas Entradas',  'Temperatura y humedad Salon 3')
                         )
@@ -516,6 +517,15 @@ def plot_html_CDI(df, title):
     # Compuerta Succión
     fig = plot_on_off(fig, df, "PosComp", "Compuerta", 'rgba(255,127,0,0.3)', axis_y="y4", r=2, c=1)
 
+
+    # Presion Spagles
+    fig.add_trace(go.Scatter(x=df.index, y=df["PresionSalon"],
+                             line=dict(color='#1616a7', width=1.5),  # dash='dash'),
+                             mode='lines', name='Presion Spagless',
+                             yaxis="y4",
+                             ),
+                  row=3, col=1)
+
     # Add figure title
     fig.update_layout(height=800, title=title)
 
@@ -525,7 +535,7 @@ def plot_html_CDI(df, title):
 
     # Set x-axis and y-axis title
     fig.update_layout(legend_title_text='Variables Salón CDI')
-    fig['layout']['xaxis2']['title'] = 'Fecha'
+    fig['layout']['xaxis3']['title'] = 'Fecha'
 
     fig['layout']['yaxis']['title'] = 'Temperaturas Entrada °C'
 
@@ -539,6 +549,8 @@ def plot_html_CDI(df, title):
 
     fig['layout']['yaxis4']['title'] = 'Apertura Compuerta, HR y HA %'
     fig['layout']['yaxis4']['range'] = [0, 100]
+
+    fig['layout']['yaxis5']['title'] = 'Presión [PSI]'
 
     fig.update_xaxes(showline=True, linewidth=0.5, linecolor='black')
     fig.update_yaxes(showline=True, linewidth=0.5, linecolor='black')

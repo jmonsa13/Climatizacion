@@ -86,7 +86,7 @@ def organize_df(df, sql_table="Salón 3"):
                       'CDIHumz2', 'CDISPW', 'CDIWZ1','CDIWZ2',
                       'CDIPosComp', 'CDIVentInyec',
                       'Extrac1', 'Extrac2', 'Extrac3',
-                      'Extrac4', 'Extrac5', 'Extrac6',
+                      'Extrac4', 'Extrac5', 'Extrac6', 'PresionSalon',
                       'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"]
         df = df[re_columns]
 
@@ -95,7 +95,7 @@ def organize_df(df, sql_table="Salón 3"):
                       'SPW', 'WZ1','WZ2',
                       'PosComp', 'VentInyec',
                       'Extrac1', 'Extrac2', 'Extrac3',
-                      'Extrac4', 'Extrac5', 'Extrac6',
+                      'Extrac4', 'Extrac5', 'Extrac6', 'PresionSalon',
                       'año', 'mes', 'dia', 'ndia', 'hora', 'minuto', 'segundo', "fecha_planta"]
 
         # Round the complete dataframe
