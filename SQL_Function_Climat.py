@@ -7,8 +7,10 @@ import os
 
 import numpy as np
 import pandas as pd
-import pyodbc
 import streamlit as st
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -273,8 +275,7 @@ def find_load(tipo, day, ini, database, table, redownload):
     return pd_sql
 
 # No poner cache en esta función para poder cargar los ultimos datos del día
-def sql_connect(tipo="day", day="2021-04-28", server='EASAB101', database='CLIMATI',
-                table="CLIMATI", username='IOTVARPROC', password='10Tv4rPr0C2021*'):
+def sql_connect(tipo="day", day="2021-04-28", database='CLIMATI', table="CLIMATI"):
     """
     Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
     INPUT:
@@ -285,9 +286,18 @@ def sql_connect(tipo="day", day="2021-04-28", server='EASAB101', database='CLIMA
     OUTPUT:
         pd_sql = pandas dataframe traído de la base de dato SQL
     """
+    # Connection keys
+    load_dotenv('./.env')
+
+    server = os.environ.get("SERVER")
+    username = os.environ.get("USER_SQL")
+    password = os.environ.get("PASSWORD")
+
     # Connecting to the sql database
-    conn = pyodbc.connect(
-        'driver={SQL Server};server=%s;database=%s;uid=%s;pwd=%s' % (server, database, username, password))
+    connection_str = "DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (server, database, username, password)
+    connection_url = URL.create("mssql+pyodbc", query={"odbc_connect": connection_str})
+
+    conn = create_engine(connection_url)
     # ------------------------------------------------------------------------------------------------------------------
     # Tipos de conexiones establecidas para traer distintas cantidades de datos
     # ------------------------------------------------------------------------------------------------------------------
