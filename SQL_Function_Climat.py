@@ -133,7 +133,7 @@ def add_day(day, add=1):
     return str(ini_date), str(fin_date)
 
 
-@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
+@st.experimental_memo(suppress_st_warning=True, show_spinner=True)
 def get_data_day(sel_dia="2022-01-01", sql_table="Salón 3", flag_download=False):
     """
     Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe
@@ -171,7 +171,7 @@ def get_data_day(sel_dia="2022-01-01", sql_table="Salón 3", flag_download=False
     return df, salud_list, salud_datos, title
 
 
-@st.cache(persist=False, allow_output_mutation=True, suppress_st_warning=True, show_spinner=True, ttl=24 * 3600)
+@st.experimental_memo(suppress_st_warning=True, show_spinner=True)
 def get_data_range(sel_dia_ini="2022-01-01", sel_dia_fin="2022-01-02", sql_table="Salón 3", flag_download=False):
     """
     Programa que permite conectar con una base de dato del servidor y devuelve la base de dato como un pandas dataframe

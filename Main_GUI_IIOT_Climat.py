@@ -100,7 +100,8 @@ if graficar is True:
         # Button to refresh the data
         if st.button("Refrescar gráfica", key="refrescar"):
             flag_download = True
-            st.legacy_caching.clear_cache()
+            get_data_day.clear()
+            get_data_range.clear()
             st.experimental_rerun()
 
         # Dibujando la grafica
@@ -114,7 +115,8 @@ if graficar is True:
         # Button to refresh the data
         if st.button("Refrescar gráfica", key="refrescar"):
             flag_download = True
-            st.legacy_caching.clear_cache()
+            get_data_day.clear()
+            get_data_range.clear()
             st.experimental_rerun()
 
         # Dibujando la grafica
@@ -128,7 +130,8 @@ if graficar is True:
         # Button to refresh the data
         if st.button("Refrescar gráfica", key="refrescar"):
             flag_download = True
-            st.legacy_caching.clear_cache()
+            get_data_day.clear()
+            get_data_range.clear()
             st.experimental_rerun()
 
         # Dibujando la grafica
@@ -142,7 +145,8 @@ if graficar is True:
         # Button to refresh the data
         if st.button("Refrescar gráfica", key="refrescar"):
             flag_download = True
-            st.legacy_caching.clear_cache()
+            get_data_day.clear()
+            get_data_range.clear()
             st.experimental_rerun()
 
         # Dibujando la grafica
